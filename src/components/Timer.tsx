@@ -13,7 +13,9 @@ export default function Timer({
   const [isRunning, setIsRunning] = useState(false)
   const [isExpired, setIsExpired] = useState(false)
   const [inputMinutes, setInputMinutes] = useState(initialMinutes)
+  const [isAlarmPlaying, setIsAlarmPlaying] = useState(false)
   const intervalRef = useRef<number | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
@@ -26,12 +28,43 @@ export default function Timer({
     }
   }, [])
 
+  const stopAlarm = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      audioRef.current = null
+    }
+    setIsAlarmPlaying(false)
+  }, [])
+
+  const playAlarm = useCallback(() => {
+    try {
+      // Stop any existing alarm
+      stopAlarm()
+
+      // Create and play audio
+      const audio = new Audio('/ElevenLabs_Digital_timer_alert_as_spacecraft_approaches_critical_orbit.mp3')
+      audioRef.current = audio
+      audio.loop = true
+      audio.volume = 0.5
+      
+      audio.play().catch((error) => {
+        console.error('Failed to play alarm:', error)
+      })
+
+      setIsAlarmPlaying(true)
+    } catch (error) {
+      console.error('Failed to play alarm:', error)
+    }
+  }, [stopAlarm])
+
   const handleExpire = useCallback(() => {
     setIsExpired(true)
     setIsRunning(false)
     clearTimerInterval()
+    playAlarm()
     onExpire?.()
-  }, [clearTimerInterval, onExpire])
+  }, [clearTimerInterval, playAlarm, onExpire])
 
   useEffect(() => {
     if (isRunning && !isExpired) {
@@ -49,10 +82,21 @@ export default function Timer({
     return clearTimerInterval
   }, [isRunning, isExpired, handleExpire, clearTimerInterval])
 
+  // Cleanup alarm on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
+
   const handleStart = () => {
     if (isExpired) {
       setTotalSeconds(inputMinutes * 60)
       setIsExpired(false)
+      stopAlarm()
     }
     setIsRunning(true)
   }
@@ -67,6 +111,7 @@ export default function Timer({
     clearTimerInterval()
     setTotalSeconds(inputMinutes * 60)
     setIsExpired(false)
+    stopAlarm()
   }
 
   const handleInputChange = (value: string) => {
@@ -143,6 +188,16 @@ export default function Timer({
         >
           {isExpired ? "Time's up!" : formatTime(minutes, seconds)}
         </div>
+        
+        {/* Stop Alarm Button */}
+        {isAlarmPlaying && (
+          <button
+            onClick={stopAlarm}
+            className='mt-2 px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors'
+          >
+            🔔 Stop Alarm
+          </button>
+        )}
       </div>
     </div>
   )
