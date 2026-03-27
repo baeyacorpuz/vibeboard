@@ -7,7 +7,7 @@ import {
   type Mood,
   type MoodData,
 } from '../lib/room';
-import { MOODS, getMoodByValue } from '../lib/moods';
+import { getMoodByValue } from '../lib/moods';
 import MoodSelector from '../components/MoodSelector';
 import MoodBoard from '../components/MoodBoard';
 import Timer from '../components/Timer';
