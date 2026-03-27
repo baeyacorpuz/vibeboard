@@ -34,10 +34,10 @@ export default function MoodSelector({
         {MOODS.map((mood) => (
           <div
             key={mood.value}
-            className="flex flex-col items-center justify-center gap-1 w-20 h-20 rounded-lg border border-gray-200 opacity-60"
+            className="flex flex-col items-center justify-center gap-1 w-20 h-20 rounded-lg border border-gray-200 dark:border-gray-700 opacity-60"
           >
             <span className="text-3xl">{mood.emoji}</span>
-            <span className="text-xs text-gray-500">{mood.label}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{mood.label}</span>
           </div>
         ))}
       </div>
@@ -56,8 +56,8 @@ export default function MoodSelector({
             type="button"
             className={`flex flex-col items-center justify-center gap-1 w-20 h-20 rounded-lg border transition-all ${
               isSelected
-                ? 'border-indigo-300 bg-indigo-50'
-                : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900'
+                : 'border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-gray-50 dark:hover:bg-gray-800'
             }`}
             style={{
               transform: isHovered && !isSelected ? 'scale(1.05)' : 'scale(1)',
@@ -69,7 +69,7 @@ export default function MoodSelector({
             aria-label={mood.label}
           >
             <span className="text-3xl">{mood.emoji}</span>
-            <span className={`text-xs ${isSelected ? 'text-indigo-600 font-medium' : 'text-gray-500'}`}>
+            <span className={`text-xs ${isSelected ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
               {mood.label}
             </span>
           </button>

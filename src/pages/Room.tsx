@@ -9,6 +9,8 @@ import {
 } from '../lib/room';
 import MoodSelector from '../components/MoodSelector';
 import MoodBoard from '../components/MoodBoard';
+import Timer from '../components/Timer';
+import ThemeToggle from '../components/ThemeToggle';
 
 const MOODS = [
   { emoji: '😊', label: 'Happy', value: 'happy' },
@@ -76,7 +78,6 @@ export default function Room() {
     }
   };
 
-  // Get mood emoji and label for display
   const getMoodDisplay = (mood: Mood | null) => {
     if (!mood) return null;
     return MOODS.find((m) => m.value === mood);
@@ -86,16 +87,16 @@ export default function Room() {
 
   if (!roomId) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-        <p className='text-gray-600'>Invalid room ID</p>
+      <div className='min-h-screen flex items-center justify-center'>
+        <p className='text-gray-600 dark:text-gray-400'>Invalid room ID</p>
       </div>
     );
   }
 
   if (status === 'joining') {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-        <div className='inline-flex items-center gap-2 text-gray-600'>
+      <div className='min-h-screen flex items-center justify-center'>
+        <div className='inline-flex items-center gap-2 text-gray-600 dark:text-gray-400'>
           <svg className='animate-spin h-5 w-5' viewBox='0 0 24 24'>
             <circle
               className='opacity-25'
@@ -120,8 +121,8 @@ export default function Room() {
 
   if (status === 'error') {
     return (
-      <div className='min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4'>
-        <p className='text-red-600'>Error: {error}</p>
+      <div className='min-h-screen flex flex-col items-center justify-center gap-4'>
+        <p className='text-red-600 dark:text-red-400'>Error: {error}</p>
         <button
           onClick={() => window.location.reload()}
           className='px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors'
@@ -133,22 +134,29 @@ export default function Room() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className='min-h-screen'>
+      <header className='flex justify-end p-4'>
+        <ThemeToggle />
+      </header>
       <main className='max-w-3xl mx-auto px-6 py-8'>
-        {/* Header */}
         <div className='flex items-center justify-between mb-8'>
-          <code className='text-sm text-gray-500 font-mono'>{roomId}</code>
+          <code className='text-sm text-gray-600 dark:text-gray-400 font-mono'>
+            {roomId}
+          </code>
           <button
             onClick={handleCopyLink}
-            className='text-sm text-gray-500 hover:text-gray-700 transition-colors'
+            className='text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors'
           >
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
 
-        {/* Mood Selector */}
+        <Timer initialMinutes={5} />
+
         <div className='mb-12'>
-          <h2 className='text-lg text-gray-900 mb-6'>How are you feeling?</h2>
+          <h2 className='text-lg text-gray-900 dark:text-gray-100 mb-6'>
+            How are you feeling?
+          </h2>
           <MoodSelector
             selectedMood={selectedMood}
             onMoodSelect={handleMoodSelect}
@@ -156,18 +164,15 @@ export default function Room() {
           />
         </div>
 
-        {/* Your Mood */}
         {moodDisplay && (
-          <p className='text-sm text-gray-600 my-8'>
+          <p className='text-sm text-gray-600 dark:text-gray-400 my-8'>
             Your mood: {moodDisplay.emoji} {moodDisplay.label}
           </p>
         )}
 
-        {/* Divider */}
-        <div className='border-t border-gray-200 my-8' />
+        <div className='border-t border-gray-200 dark:border-gray-700 my-8' />
 
-        {/* Live Results */}
-        <MoodBoard moods={moods} yourMood={selectedMood} />
+        <MoodBoard moods={moods} yourMood={selectedMood} roomId={roomId} />
       </main>
     </div>
   );

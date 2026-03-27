@@ -2,9 +2,19 @@
 
 @layer base {
   :root {
-    --color-background: #ffffff;
-    --color-foreground: #0a0a0a;
+    --color-background: #f9fafb;
+    --color-foreground: #111827;
     --color-border: #e5e7eb;
+  }
+
+  .dark {
+    --color-background: #111827;
+    --color-foreground: #f3f4f6;
+    --color-border: #374151;
+  }
+
+  html {
+    background-color: var(--color-background);
   }
 
   * {
@@ -12,7 +22,6 @@
   }
 
   body {
-    background-color: var(--color-background);
     color: var(--color-foreground);
     font-family:
       system-ui,
@@ -30,5 +39,6 @@
     min-height: 100vh;
     border-left: 1px solid var(--color-border);
     border-right: 1px solid var(--color-border);
+    background-color: var(--color-background);
   }
 }

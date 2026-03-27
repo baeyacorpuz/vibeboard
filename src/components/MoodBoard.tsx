@@ -3,6 +3,7 @@ import { type MoodData } from '../lib/room'
 interface MoodBoardProps {
   moods: MoodData[]
   yourMood?: string | null
+  roomId?: string
 }
 
 const MOODS = [
@@ -13,11 +14,26 @@ const MOODS = [
   { emoji: '💤', label: 'Tired', value: 'tired' },
 ]
 
-export default function MoodBoard({ moods, yourMood }: MoodBoardProps) {
+export default function MoodBoard({ moods, yourMood, roomId }: MoodBoardProps) {
   const moodCounts = MOODS.map((mood) => ({
     ...mood,
     count: moods.filter((m) => m.mood === mood.value).length,
   }))
+
+  const exportToCSV = () => {
+    const csv = [
+      'Mood,Count',
+      ...moodCounts.map((m) => `${m.label},${m.count}`),
+    ].join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `mood-results-${roomId || 'unknown'}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   // Calculate max count for bar width calculation
   const maxCount = Math.max(...moodCounts.map((m) => m.count), 1)
@@ -26,17 +42,27 @@ export default function MoodBoard({ moods, yourMood }: MoodBoardProps) {
   if (moods.length === 0) {
     return (
       <div className="mb-8">
-        <p className="text-sm text-gray-500">No moods submitted yet</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">No moods submitted yet</p>
       </div>
     )
   }
 
   return (
-    <div className="mb-8">
+    <div className='mb-8'>
       {/* Header */}
-      <p className="text-sm text-gray-500 mb-6">
-        Team · {moods.length} {moods.length === 1 ? 'person' : 'people'}
-      </p>
+      <div className='flex items-center justify-between mb-6'>
+        <p className='text-sm text-gray-500 dark:text-gray-400'>
+          Team · {moods.length} {moods.length === 1 ? 'person' : 'people'}
+        </p>
+        {moods.length > 0 && (
+          <button
+            onClick={exportToCSV}
+            className='text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
+          >
+            Export CSV
+          </button>
+        )}
+      </div>
 
       {/* Mood Bars */}
       <div className="space-y-4">
@@ -50,7 +76,7 @@ export default function MoodBoard({ moods, yourMood }: MoodBoardProps) {
                 <span className="text-2xl">{mood.emoji}</span>
                 <span className="text-lg font-medium">{mood.count}</span>
               </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
                     isYou ? 'bg-indigo-600' : 'bg-indigo-400'
