@@ -38,24 +38,28 @@ export default function Timer({
   }, [])
 
   const playAlarm = useCallback(() => {
-    try {
-      // Stop any existing alarm
-      stopAlarm()
+    // Stop any existing alarm
+    stopAlarm()
 
-      // Create and play audio
-      const audio = new Audio('/ElevenLabs_Digital_timer_alert_as_spacecraft_approaches_critical_orbit.mp3')
-      audioRef.current = audio
-      audio.loop = true
-      audio.volume = 0.5
-      
-      audio.play().catch((error) => {
+    // Create and play audio
+    const audio = new Audio('/ElevenLabs_Digital_timer_alert_as_spacecraft_approaches_critical_orbit.mp3')
+    audioRef.current = audio
+    audio.loop = true
+    audio.volume = 0.5
+
+    audio.play()
+      .then(() => {
+        // Only set playing state after audio actually starts
+        setIsAlarmPlaying(true)
+      })
+      .catch((error) => {
+        // AbortError is expected when stopAlarm() is called while audio is loading
+        if (error.name === 'AbortError') {
+          // This is normal - user stopped the alarm or component unmounted
+          return
+        }
         console.error('Failed to play alarm:', error)
       })
-
-      setIsAlarmPlaying(true)
-    } catch (error) {
-      console.error('Failed to play alarm:', error)
-    }
   }, [stopAlarm])
 
   const handleExpire = useCallback(() => {
