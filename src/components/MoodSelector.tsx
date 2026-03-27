@@ -1,25 +1,12 @@
 import { useState } from 'react'
 import { type Mood } from '../lib/room'
-
-interface MoodOption {
-  emoji: string
-  label: string
-  value: Mood
-}
+import { MOODS } from '../lib/moods'
 
 interface MoodSelectorProps {
   selectedMood: Mood | null
   onMoodSelect: (mood: Mood) => void
   disabled?: boolean
 }
-
-const MOODS: MoodOption[] = [
-  { emoji: '😊', label: 'Happy', value: 'happy' },
-  { emoji: '😐', label: 'Neutral', value: 'neutral' },
-  { emoji: '😓', label: 'Stressed', value: 'stressed' },
-  { emoji: '🔥', label: 'Productive', value: 'productive' },
-  { emoji: '💤', label: 'Tired', value: 'tired' },
-]
 
 export default function MoodSelector({
   selectedMood,

@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
+// Room ID validation: alphanumeric, hyphens, underscores, max 50 chars
+const ROOM_ID_REGEX = /^[a-zA-Z0-9_-]{1,50}$/;
+
 export default function Home() {
   const navigate = useNavigate();
   const [roomIdInput, setRoomIdInput] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleCreateRoom = () => {
     const roomId = crypto.randomUUID();
@@ -13,9 +17,21 @@ export default function Home() {
 
   const handleJoinRoom = (e: React.FormEvent) => {
     e.preventDefault();
-    if (roomIdInput.trim()) {
-      navigate(`/room/${roomIdInput.trim()}`);
+    setError(null);
+    
+    const trimmedId = roomIdInput.trim();
+    
+    if (!trimmedId) {
+      setError('Please enter a room ID');
+      return;
     }
+    
+    if (!ROOM_ID_REGEX.test(trimmedId)) {
+      setError('Room ID can only contain letters, numbers, hyphens, and underscores (max 50 characters)');
+      return;
+    }
+    
+    navigate(`/room/${trimmedId}`);
   };
 
   return (
@@ -41,20 +57,28 @@ export default function Home() {
             >
               Create Room
             </button>
-            <form onSubmit={handleJoinRoom} className='flex gap-2'>
-              <input
-                type='text'
-                placeholder='Enter room ID'
-                value={roomIdInput}
-                onChange={(e) => setRoomIdInput(e.target.value)}
-                className='w-40 px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
-              />
-              <button
-                type='submit'
-                className='px-4 py-2.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800 border border-indigo-600 dark:border-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors'
-              >
-                Join
-              </button>
+            <form onSubmit={handleJoinRoom} className='flex flex-col gap-2'>
+              <div className='flex gap-2'>
+                <input
+                  type='text'
+                  placeholder='Enter room ID'
+                  value={roomIdInput}
+                  onChange={(e) => {
+                    setRoomIdInput(e.target.value);
+                    setError(null);
+                  }}
+                  className='w-40 px-3 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+                />
+                <button
+                  type='submit'
+                  className='px-4 py-2.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800 border border-indigo-600 dark:border-indigo-400 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors'
+                >
+                  Join
+                </button>
+              </div>
+              {error && (
+                <p className='text-sm text-red-600 dark:text-red-400'>{error}</p>
+              )}
             </form>
           </div>
         </section>

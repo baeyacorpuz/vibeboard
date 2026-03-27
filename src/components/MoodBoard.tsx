@@ -1,18 +1,11 @@
 import { type MoodData } from '../lib/room'
+import { MOODS } from '../lib/moods'
 
 interface MoodBoardProps {
   moods: MoodData[]
   yourMood?: string | null
   roomId?: string
 }
-
-const MOODS = [
-  { emoji: '😊', label: 'Happy', value: 'happy' },
-  { emoji: '😐', label: 'Neutral', value: 'neutral' },
-  { emoji: '😓', label: 'Stressed', value: 'stressed' },
-  { emoji: '🔥', label: 'Productive', value: 'productive' },
-  { emoji: '💤', label: 'Tired', value: 'tired' },
-]
 
 export default function MoodBoard({ moods, yourMood, roomId }: MoodBoardProps) {
   const moodCounts = MOODS.map((mood) => ({

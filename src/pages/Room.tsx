@@ -7,18 +7,11 @@ import {
   type Mood,
   type MoodData,
 } from '../lib/room';
+import { MOODS, getMoodByValue } from '../lib/moods';
 import MoodSelector from '../components/MoodSelector';
 import MoodBoard from '../components/MoodBoard';
 import Timer from '../components/Timer';
 import ThemeToggle from '../components/ThemeToggle';
-
-const MOODS = [
-  { emoji: '😊', label: 'Happy', value: 'happy' },
-  { emoji: '😐', label: 'Neutral', value: 'neutral' },
-  { emoji: '😓', label: 'Stressed', value: 'stressed' },
-  { emoji: '🔥', label: 'Productive', value: 'productive' },
-  { emoji: '💤', label: 'Tired', value: 'tired' },
-];
 
 export default function Room() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -80,7 +73,7 @@ export default function Room() {
 
   const getMoodDisplay = (mood: Mood | null) => {
     if (!mood) return null;
-    return MOODS.find((m) => m.value === mood);
+    return getMoodByValue(mood);
   };
 
   const moodDisplay = getMoodDisplay(selectedMood);

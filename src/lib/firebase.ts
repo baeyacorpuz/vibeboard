@@ -10,14 +10,6 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-// Debug: Check if env vars are loaded
-console.log('Firebase Config:', {
-  hasApiKey: !!firebaseConfig.apiKey,
-  hasAuthDomain: !!firebaseConfig.authDomain,
-  hasProjectId: !!firebaseConfig.projectId,
-  projectId: firebaseConfig.projectId,
-})
-
 // Prevent duplicate initialization
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
 export const db = getFirestore(app)
