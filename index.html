@@ -4,10 +4,76 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vibeboard</title>
+
+    <!-- Primary Meta Tags -->
+    <title>VibeBoard - Anonymous Team Mood Check-ins</title>
+    <meta name="title" content="VibeBoard - Anonymous Team Mood Check-ins" />
+    <meta
+      name="description"
+      content="Fast, anonymous mood check-ins for sprint retrospectives, daily standups, and async teams. Share how you're feeling with your team in real-time."
+    />
+    <meta
+      name="keywords"
+      content="mood meter, team mood, retrospective, sprint retro, daily check-in, team sentiment, anonymous feedback, agile, scrum"
+    />
+    <meta name="author" content="VibeBoard" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://VibeBoard.app/" />
+    <meta
+      property="og:title"
+      content="VibeBoard - Anonymous Team Mood Check-ins"
+    />
+    <meta
+      property="og:description"
+      content="Fast, anonymous mood check-ins for sprint retrospectives, daily standups, and async teams."
+    />
+    <meta property="og:image" content="https://VibeBoard.app/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://VibeBoard.app/" />
+    <meta
+      property="twitter:title"
+      content="VibeBoard - Anonymous Team Mood Check-ins"
+    />
+    <meta
+      property="twitter:description"
+      content="Fast, anonymous mood check-ins for sprint retrospectives, daily standups, and async teams."
+    />
+    <meta
+      property="twitter:image"
+      content="https://VibeBoard.app/og-image.png"
+    />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#6366f1" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://VibeBoard.app/" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "VibeBoard",
+        "description": "Fast, anonymous mood check-ins for sprint retrospectives, daily standups, and async teams.",
+        "url": "https://VibeBoard.app",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
   </body>
 </html>
