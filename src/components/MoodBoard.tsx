@@ -67,7 +67,13 @@ export default function MoodBoard({ moods, yourMood, roomId }: MoodBoardProps) {
             <div key={mood.value}>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl">{mood.emoji}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{mood.label}</span>
                 <span className="text-lg font-medium">{mood.count}</span>
+                {isYou && (
+                  <span className="px-2 py-0.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full">
+                    You
+                  </span>
+                )}
               </div>
               <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div

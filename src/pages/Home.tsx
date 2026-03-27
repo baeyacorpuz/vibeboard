@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
 
+interface RecentRoom {
+  id: string;
+  name: string | null;
+  visitedAt: number;
+}
+
 // Room ID validation: alphanumeric, hyphens, underscores, max 50 chars
 const ROOM_ID_REGEX = /^[a-zA-Z0-9_-]{1,50}$/;
 
@@ -9,6 +15,10 @@ export default function Home() {
   const navigate = useNavigate();
   const [roomIdInput, setRoomIdInput] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [recentRooms] = useState<RecentRoom[]>(() => {
+    const stored = JSON.parse(localStorage.getItem('vibeboard_recent_rooms') || '[]');
+    return stored.slice(0, 5);
+  });
 
   const handleCreateRoom = () => {
     const roomId = crypto.randomUUID();
@@ -32,6 +42,34 @@ export default function Home() {
     }
     
     navigate(`/room/${trimmedId}`);
+  };
+
+  const truncateId = (id: string, maxLength = 20) => {
+    if (id.length <= maxLength) return id;
+    return id.slice(0, maxLength) + '...';
+  };
+
+  const formatVisitedDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+    
+    if (isToday) {
+      return 'Today';
+    }
+    
+    if (isYesterday) {
+      return 'Yesterday';
+    }
+    
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+    }).format(date);
   };
 
   return (
@@ -168,6 +206,45 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Recent Rooms Section */}
+        {recentRooms.length > 0 && (
+          <section className='mt-8'>
+            <div className='border-t border-gray-200 dark:border-gray-700 my-6' />
+            <h2 className='text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 text-center'>
+              Recent Rooms
+            </h2>
+            <div className='space-y-2'>
+              {recentRooms.map((room) => (
+                <button
+                  key={room.id}
+                  onClick={() => navigate(`/room/${room.id}`)}
+                  className='w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors group'
+                >
+                  <div className='flex items-center gap-3'>
+                    <span className='text-lg'>🚪</span>
+                    <div className='text-left'>
+                      <p className='text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'>
+                        {room.name || truncateId(room.id)}
+                      </p>
+                      <p className='text-xs text-gray-500 dark:text-gray-400 font-mono'>
+                        {truncateId(room.id, 15)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-xs text-gray-400 dark:text-gray-500'>
+                      {formatVisitedDate(room.visitedAt)}
+                    </span>
+                    <svg className='w-4 h-4 text-gray-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                    </svg>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

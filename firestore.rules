@@ -5,7 +5,7 @@ service cloud.firestore {
     match /rooms/{roomId} {
       allow read: if true;
       allow create: if true;
-      allow update, delete: if false; // Rooms are immutable once created
+      allow update: if true; // Allow updating name field
       
       // Moods subcollection - anyone can submit and read moods
       match /moods/{moodId} {
@@ -13,6 +13,12 @@ service cloud.firestore {
         allow create: if true;
         allow update: if true; // Allow users to update their own mood
         allow delete: if false; // Prevent deletion of mood data
+      }
+      
+      // Snapshots subcollection - anyone can create and read snapshots
+      match /snapshots/{snapshotId} {
+        allow read: if true;
+        allow create: if true;
       }
     }
   }
