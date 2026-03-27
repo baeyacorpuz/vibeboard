@@ -19,83 +19,48 @@ export default function MoodBoard({ moods, yourMood }: MoodBoardProps) {
     count: moods.filter((m) => m.mood === mood.value).length,
   }))
 
-  const containerStyle: React.CSSProperties = {
-    padding: '16px',
-    backgroundColor: '#f9fafb',
-    borderRadius: '12px',
-    minWidth: '200px',
-  }
-
-  const headerStyle: React.CSSProperties = {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#1f2937',
-    marginBottom: '12px',
-  }
-
-  const getRowStyle = (moodValue: string): React.CSSProperties => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '6px 8px',
-    fontSize: '14px',
-    color: '#374151',
-    backgroundColor: moodValue === yourMood ? '#f5f3ff' : 'transparent',
-    borderRadius: '6px',
-    borderLeft: moodValue === yourMood ? '3px solid #6366f1' : '3px solid transparent',
-  })
-
-  const emojiStyle: React.CSSProperties = {
-    fontSize: '18px',
-    width: '24px',
-    textAlign: 'center' as const,
-  }
-
-  const countStyle: React.CSSProperties = {
-    fontWeight: 600,
-    color: '#6366f1',
-    marginLeft: 'auto',
-  }
+  // Calculate max count for bar width calculation
+  const maxCount = Math.max(...moodCounts.map((m) => m.count), 1)
 
   // Empty state
   if (moods.length === 0) {
     return (
-      <div style={containerStyle}>
-        <div style={headerStyle}>Team Mood</div>
-        <div style={{ 
-          borderTop: '1px solid #e5e7eb', 
-          paddingTop: '16px',
-          textAlign: 'center',
-          color: '#6b7280',
-          fontSize: '14px'
-        }}>
-          <p style={{ marginBottom: '8px' }}>No moods submitted yet</p>
-          <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-            Be the first to share how you're feeling!
-          </p>
-        </div>
+      <div className="mb-8">
+        <p className="text-sm text-gray-500">No moods submitted yet</p>
       </div>
     )
   }
 
   return (
-    <div style={containerStyle}>
-      <div style={headerStyle}>
-        Team Mood ({moods.length} participant{moods.length !== 1 ? 's' : ''})
-      </div>
-      <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '8px' }}>
-        {moodCounts.map((mood) => (
-          <div key={mood.value} style={getRowStyle(mood.value)}>
-            <span style={emojiStyle}>{mood.emoji}</span>
-            <span>{mood.label}</span>
-            {mood.value === yourMood && (
-              <span style={{ fontSize: '12px', color: '#6366f1', marginLeft: '4px' }}>
-                (You)
-              </span>
-            )}
-            <span style={countStyle}>x {mood.count}</span>
-          </div>
-        ))}
+    <div className="mb-8">
+      {/* Header */}
+      <p className="text-sm text-gray-500 mb-6">
+        Team · {moods.length} {moods.length === 1 ? 'person' : 'people'}
+      </p>
+
+      {/* Mood Bars */}
+      <div className="space-y-4">
+        {moodCounts.map((mood) => {
+          const barWidth = maxCount > 0 ? (mood.count / maxCount) * 100 : 0
+          const isYou = mood.value === yourMood
+
+          return (
+            <div key={mood.value}>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">{mood.emoji}</span>
+                <span className="text-lg font-medium">{mood.count}</span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    isYou ? 'bg-indigo-600' : 'bg-indigo-400'
+                  }`}
+                  style={{ width: `${barWidth}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

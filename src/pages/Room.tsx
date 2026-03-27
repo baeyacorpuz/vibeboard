@@ -1,141 +1,174 @@
-import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { joinRoom, submitMood, subscribeToMoods, type Mood, type MoodData } from '../lib/room'
-import MoodSelector from '../components/MoodSelector'
-import MoodBoard from '../components/MoodBoard'
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import {
+  joinRoom,
+  submitMood,
+  subscribeToMoods,
+  type Mood,
+  type MoodData,
+} from '../lib/room';
+import MoodSelector from '../components/MoodSelector';
+import MoodBoard from '../components/MoodBoard';
+
+const MOODS = [
+  { emoji: '😊', label: 'Happy', value: 'happy' },
+  { emoji: '😐', label: 'Neutral', value: 'neutral' },
+  { emoji: '😓', label: 'Stressed', value: 'stressed' },
+  { emoji: '🔥', label: 'Productive', value: 'productive' },
+  { emoji: '💤', label: 'Tired', value: 'tired' },
+];
 
 export default function Room() {
-  const { roomId } = useParams<{ roomId: string }>()
-  const [status, setStatus] = useState<'joining' | 'joined' | 'error'>('joining')
-  const [error, setError] = useState<string | null>(null)
-  const [selectedMood, setSelectedMood] = useState<Mood | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [moods, setMoods] = useState<MoodData[]>([])
-  const [copied, setCopied] = useState(false)
+  const { roomId } = useParams<{ roomId: string }>();
+  const [status, setStatus] = useState<'joining' | 'joined' | 'error'>(
+    'joining',
+  );
+  const [error, setError] = useState<string | null>(null);
+  const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [moods, setMoods] = useState<MoodData[]>([]);
+  const [copied, setCopied] = useState(false);
 
-  const roomUrl = `${window.location.origin}/room/${roomId}`
+  const roomUrl = `${window.location.origin}/room/${roomId}`;
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(roomUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(roomUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err)
+      console.error('Failed to copy:', err);
     }
-  }
+  };
 
   useEffect(() => {
-    if (!roomId) return
-    
+    if (!roomId) return;
+
     joinRoom(roomId)
       .then(() => setStatus('joined'))
       .catch((err) => {
-        setStatus('error')
-        setError(err.message)
-      })
-  }, [roomId])
+        setStatus('error');
+        setError(err.message);
+      });
+  }, [roomId]);
 
   useEffect(() => {
-    if (!roomId || status !== 'joined') return
-    
+    if (!roomId || status !== 'joined') return;
+
     const unsubscribe = subscribeToMoods(roomId, (moodData) => {
-      setMoods(moodData)
-    })
-    
-    return () => unsubscribe()
-  }, [roomId, status])
+      setMoods(moodData);
+    });
+
+    return () => unsubscribe();
+  }, [roomId, status]);
 
   const handleMoodSelect = async (mood: Mood) => {
-    if (!roomId) return
+    if (!roomId) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      await submitMood(roomId, mood)
-      setSelectedMood(mood)
+      await submitMood(roomId, mood);
+      setSelectedMood(mood);
     } catch (err) {
-      console.error('Failed to submit mood:', err)
+      console.error('Failed to submit mood:', err);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
+
+  // Get mood emoji and label for display
+  const getMoodDisplay = (mood: Mood | null) => {
+    if (!mood) return null;
+    return MOODS.find((m) => m.value === mood);
+  };
+
+  const moodDisplay = getMoodDisplay(selectedMood);
 
   if (!roomId) {
-    return <div>Invalid room ID</div>
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <p className='text-gray-600'>Invalid room ID</p>
+      </div>
+    );
   }
 
   if (status === 'joining') {
-    return <div>Joining room...</div>
+    return (
+      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+        <div className='inline-flex items-center gap-2 text-gray-600'>
+          <svg className='animate-spin h-5 w-5' viewBox='0 0 24 24'>
+            <circle
+              className='opacity-25'
+              cx='12'
+              cy='12'
+              r='10'
+              stroke='currentColor'
+              strokeWidth='4'
+              fill='none'
+            />
+            <path
+              className='opacity-75'
+              fill='currentColor'
+              d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z'
+            />
+          </svg>
+          Joining room...
+        </div>
+      </div>
+    );
   }
 
   if (status === 'error') {
     return (
-      <div>
-        <p>Error: {error}</p>
-        <button onClick={() => window.location.reload()}>Retry</button>
+      <div className='min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4'>
+        <p className='text-red-600'>Error: {error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className='px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors'
+        >
+          Retry
+        </button>
       </div>
-    )
+    );
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>
-          Room
-        </p>
-        <code style={{ 
-          fontSize: '12px', 
-          color: '#6b7280',
-          backgroundColor: '#f3f4f6',
-          padding: '4px 8px',
-          borderRadius: '4px',
-        }}>
-          {roomId}
-        </code>
-      </div>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
-          Share this link with your team:
-        </p>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <code style={{ 
-            padding: '8px 12px', 
-            backgroundColor: '#f3f4f6', 
-            borderRadius: '6px',
-            fontSize: '13px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            maxWidth: '300px'
-          }}>
-            {roomUrl}
-          </code>
-          <button 
+    <div className='min-h-screen bg-gray-50'>
+      <main className='max-w-3xl mx-auto px-6 py-8'>
+        {/* Header */}
+        <div className='flex items-center justify-between mb-8'>
+          <code className='text-sm text-gray-500 font-mono'>{roomId}</code>
+          <button
             onClick={handleCopyLink}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: copied ? '#10b981' : '#6366f1',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: 500,
-            }}
+            className='text-sm text-gray-500 hover:text-gray-700 transition-colors'
           >
-            {copied ? 'Copied!' : 'Copy Link'}
+            {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
-      </div>
-      <h2 style={{ marginBottom: '1rem' }}>How are you feeling?</h2>
-      <MoodSelector
-        selectedMood={selectedMood}
-        onMoodSelect={handleMoodSelect}
-        disabled={isSubmitting}
-      />
-      <div style={{ marginTop: '2rem' }}>
+
+        {/* Mood Selector */}
+        <div className='mb-12'>
+          <h2 className='text-lg text-gray-900 mb-6'>How are you feeling?</h2>
+          <MoodSelector
+            selectedMood={selectedMood}
+            onMoodSelect={handleMoodSelect}
+            disabled={isSubmitting}
+          />
+        </div>
+
+        {/* Your Mood */}
+        {moodDisplay && (
+          <p className='text-sm text-gray-600 my-8'>
+            Your mood: {moodDisplay.emoji} {moodDisplay.label}
+          </p>
+        )}
+
+        {/* Divider */}
+        <div className='border-t border-gray-200 my-8' />
+
+        {/* Live Results */}
         <MoodBoard moods={moods} yourMood={selectedMood} />
-      </div>
+      </main>
     </div>
-  )
+  );
 }
